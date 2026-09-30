@@ -1,0 +1,12 @@
+# Area check period (seconds)
+area_music.check_interval (Area check interval) float 1.0 0.2 10.0
+
+# Default playback gain
+area_music.default_gain (Default music gain) float 0.5 0.0 1.0
+
+# Fade duration (seconds): fade-OUT on leave/area-switch/shuffle-end, and fade-IN on 1-track loop starts
+area_music.fade_duration (Music fade in/out duration) float 2.0 0.0 30.0
+
+# Fallback track length (seconds) when Ogg/ffprobe duration cannot be read for a file.
+# On /am_reload (and load), real durations are measured once into an in-memory table.
+area_music.default_track_length (Fallback track length if duration unknown) float 180 10 3600

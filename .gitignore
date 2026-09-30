@@ -1,0 +1,16 @@
+# Editor / OS junk
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.bak
+*.bak-*
+
+# Local backups next to the mod (e.g. area_music.bak-flatpak-*)
+*.bak-flatpak-*
+
+# Never commit world runtime data if someone inits git from a world copy
+area_music_areas.dat
+area_music_track_lengths.dat
+*.ogg
