@@ -1,4 +1,4 @@
-# area_music (v2)
+# Area Music
 
 Cuboid **area playlists** for **Luanti** / Minetest. Music lives in the **world folder** (not in the mod). The server pushes `.ogg` files to clients with `core.dynamic_add_media`.
 
@@ -34,7 +34,7 @@ On scan / `/am_reload`, files with invalid names are **skipped** with a clear se
 
 ## Creative inventory
 
-**Area Music Jukebox** and **Area Music Wand** are normal registered items — they appear in the creative inventory (search “Area Music”). `/am_jukebox` / `/am_wand` remain optional shortcuts. The broken jukebox node is hidden from creative (it only appears when a placed jukebox cannot link).
+**Area Music Jukebox** and **Area Music Wand** are normal registered items — they appear in the creative inventory (search “Area Music”). You can also obtain them with `/am_jukebox` / `/am_wand`.
 
 ## Quick start
 
@@ -49,28 +49,19 @@ All admin actions need the **`server`** privilege.
 
 ## Playlists
 
-Areas no longer store a single track at creation. Each area has:
+Each area has:
 
-```text
-playlist.tracks  — list of basenames (no .ogg)
-playlist.mode    — auto: "loop" if ≤1 track, "shuffle" if 2+
-playlist.gap     — seconds after entering, and between shuffle tracks (0 = none)
-
-```
+- List of tracks that may play
+- "Fade-in" toggle
+- "Gap" in seconds
 
 | Playlist size | Behavior |
 |---------------|----------|
 | **0 tracks** | Silence until you add tracks at a jukebox. |
-| **1 track** | Auto **loop**. Fade-in (if the jukebox toggle is on) only when entering the area — not on later loop restarts. Re-enter respects `gap`. |
-| **2+ tracks** | Auto **shuffle** (no immediate repeat). Advances after cached track duration + gap. |
-
-Mode is automatic — there is no loop/shuffle toggle in the jukebox.
+| **1 track** | **Seamless loop**. "Gap" is a delay until the music starts after entering the area.|
+| **2+ tracks** | **Endless shuffle**. Tracks are played at random, with "Gap" as a delay between each one.|
 
 **Track durations:** On load and `/am_reload`, each `world/area_music/*.ogg` is measured **once** (pure Lua Ogg/Vorbis parse; `ffprobe` on PATH as fallback). Lengths live in an in-memory table (also written to `world/area_music_track_lengths.dat`) and are **not** re-parsed when a track plays. Shuffle uses that cached length with monotonic timing from play start. If a file cannot be measured, `area_music.default_track_length` (default **180**) is used and a warning is logged.
-
-**Pitch:** not used — there is no pitch control in UI, data, or playback.
-
-Old v1 areas with a `.track` field are migrated automatically to `playlist.tracks = {track}`, `mode = "loop"`.
 
 ## Jukebox
 
@@ -121,18 +112,10 @@ When several areas contain the player:
 
 Volume is the inclusive block count between the two corners (WorldEdit-style).
 
-
-## Shuffle / gap timing notes
-
-- **1 track** → engine `loop=true`. If fade-in is on, the **enter** play fades in; later engine-loop restarts stay at full volume.
-- **2+ tracks** → `loop=false`; after the **cached duration** the mod fades out, waits **gap**, then plays a different track (never the previous). If fade-in is on, only the **first** track after enter (or playlist-edit reenter) fades in; later shuffle picks start at full volume.
-- Entering an area with **gap > 0** waits in silence before the first track.
-- Timing uses engine monotonic time (`core.get_us_time`) aligned with `core.after`, so mid-stay advances do not depend on re-entering the area.
-
 ## Fade
 
 - **Fade-in** is a **per-jukebox toggle** (`playlist.fade_in`, default **off**). Duration is `area_music.fade_duration` (default **2.0** s). When on: fade-in only as the player **enters** the area (1-track first play, or shuffle’s first track). Later loop restarts and later shuffle picks start at full volume. When off: every start is full volume.
-- **Fade-out** on leave, area-switch, or shuffle track end is unchanged: `sound_fade` to 0, then `sound_stop`. In-flight fades are tracked so a new play does not fight an old fade; leaveplayer invalidates state.
+- **Fade-out** on leave, area-switch, or shuffle track end is always on: `sound_fade` to 0, then `sound_stop`. In-flight fades are tracked so a new play does not fight an old fade; leaveplayer invalidates state.
 
 Without `sound_fade`, fade-out is a delayed stop and fade-in is skipped (starts at full gain).
 
@@ -143,6 +126,8 @@ Without `sound_fade`, fade-out is a delayed stop and fade-in is skipped (starts 
 - Areas are stored in `<worldpath>/area_music_areas.dat`.
 
 ## Settings
+
+These knobs live in `settingtypes.txt` / `minetest.conf`. Fade *behavior* is under [Fade](#fade); durations and gain are set here.
 
 ```text
 area_music.check_interval = 1.0
@@ -192,4 +177,4 @@ area_music/                      ← this mod (no .ogg here)
 
 ## License
 
-Apache License 2.0 — see `LICENSE`. Copyright 2026 Wilbur Jaywright.
+Apache License 2.0 — see `LICENSE`. Copyright 2026 Wilbur Jaywright, supervising generation by Grok Bot.
