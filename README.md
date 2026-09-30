@@ -61,6 +61,16 @@ Each area has:
 | **1 track** | **Seamless loop**. "Gap" is a delay until the music starts after entering the area.|
 | **2+ tracks** | **Endless shuffle**. Tracks are played at random, with "Gap" as a delay between each one.|
 
+For modders, the technical references for these parameters are:
+
+```text
+playlist.tracks   — list of basenames (no .ogg)
+playlist.mode     — auto: "loop" if ≤1 track, "shuffle" if 2+
+playlist.gap      — seconds after entering, and between shuffle tracks (0 = none)
+playlist.fade_in  — per-jukebox toggle (default false); see Fade
+priority          — area overlap ranking (`/am_add` / `/am_priority`)
+```
+
 **Track durations:** On load and `/am_reload`, each `world/area_music/*.ogg` is measured **once** (pure Lua Ogg/Vorbis parse; `ffprobe` on PATH as fallback). Lengths live in an in-memory table (also written to `world/area_music_track_lengths.dat`) and are **not** re-parsed when a track plays. Shuffle uses that cached length with monotonic timing from play start. If a file cannot be measured, `area_music.default_track_length` (default **180**) is used and a warning is logged.
 
 ## Jukebox
